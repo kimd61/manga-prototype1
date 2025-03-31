@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyMangaList</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <header>
+        <!-- LOGO -->
+        <div class="container">
+            <div class="logo">
+                <h1>MyMangaList</h1>
+            </div>
+            <!-- NAV BAR -->
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#">Browse</a></li>
+                    <li><a href="#">My List</a></li>
+                    <li><a href="#">Forum</a></li>
+                </ul>
+            </nav>
+            <!-- SEARCH BAR -->
+            <div class="search-bar">
+                <input type="text" placeholder="Search for manga...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <!-- LOGIN -->
+            <div class="user-profile">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN SECTION -->
+    <main>
+        <!-- HERO SECTION WITH FEATURES -->
+        <div class="hero-section">
+            <div class="container">
+                <h1>Your next-gen hub for anime and manga</h1>
+                <p>Discover, share, and track your favorite anime and manga—all in one place with MyMangaList, the ultimate next-gen manga platform.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <img src="assets/1_whitestats.png" alt="Stats">
+                        </div>
+                        <div class="feature-content">
+                            <h3>Explore Your Reading Trends</h3>
+                            <p>See your top genres, most-read authors, and track your reading habits with detailed stats over time.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <img src="assets/2_whiteapps.png" alt="Mobile">
+                        </div>
+                        <div class="feature-content">
+                            <h3>Bring MyMangaList anywhere</h3>
+                            <p>Keep track of your progress on-the-go with one of many MyMangaList apps across iOS, Android, macOS, and Windows.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <img src="assets/3_whitesocial.png" alt="Forum">
+                        </div>
+                        <div class="feature-content">
+                            <h3>Review and Save What You Love</h3>
+                            <p>Save what you've read and keep track of your favorite series for easy access anytime.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <img src="assets/4_whitecustom.png" alt="Customize">
+                        </div>
+                        <div class="feature-content">
+                            <h3>Make It Yours</h3>
+                            <p>Adjust your scoring style, title display, and other settings.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="join-now-container">
+                    <a href="#" class="join-now-btn">Join Now <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- HEADER WITH FILTER -->
+            <div class="section-header">
+                <h2>Top Manga</h2>
+                <div class="filter-controls">
+                    <select id="filter-type">
+                        <option value="bypopularity">Popularity</option>
+                        <option value="favorite">Favorites</option>
+                        <option value="rank">Rank</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading top manga...</p>
+            </div>
+
+            <div class="manga-grid" id="manga-grid">
+                <!-- Manga cards will be populated here by JavaScript -->
+            </div>
+
+            <div class="pagination">
+                <button id="load-more">Load More</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 MangaTrack. Using Jikan API.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-reddit"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
