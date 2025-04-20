@@ -280,10 +280,9 @@ function createMangaCard(manga) {
         </div>
     `;
     
-    // Add click event to show more details (future feature)
+    // Add click event to navigate to the manga detail page
     card.addEventListener('click', () => {
-        console.log(`Manga clicked: ${manga.mal_id} - ${title}`);
-        // Future enhancement: Show manga details modal or navigate to details page
+        window.location.href = `manga-detail.html?id=${manga.mal_id}`;
     });
     
     return card;

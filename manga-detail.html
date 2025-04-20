@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga Details - MyMangaList</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="manga-detail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>MyMangaList</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="browse.html">Browse</a></li>
+                    <li><a href="#">My List</a></li>
+                </ul>
+            </nav>
+            <div class="search-bar">
+                <input type="text" placeholder="Search for manga...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <!-- Loading indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading manga details...</p>
+            </div>
+
+            <!-- Manga Detail Content -->
+            <div class="manga-detail" id="manga-detail">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+
+            <!-- Error Message (initially hidden) -->
+            <div class="error-message" id="error-message" style="display: none;">
+                Unable to load manga details. Please try again later.
+            </div>
+
+            <!-- Related Manga Section -->
+            <div class="related-manga-section" id="related-manga-section" style="display: none;">
+                <h2>You May Also Like</h2>
+                <div class="manga-grid" id="related-manga-grid">
+                    <!-- Related manga cards will be populated here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 MyMangaList. Using Jikan API.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-reddit"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="manga-detail.js"></script>
+</body>
+</html>
