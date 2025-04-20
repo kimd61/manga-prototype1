@@ -182,7 +182,9 @@ function createMangaListItem(manga, index) {
     
     item.innerHTML = `
         <div class="list-cell cell-cover">
-            ${index}
+            <div class="manga-cover-small">
+                <img src="${manga.imageUrl}" alt="${manga.title}" loading="lazy">
+            </div>
         </div>
         <div class="list-cell cell-title">
             <div class="manga-title-main">${manga.title}</div>

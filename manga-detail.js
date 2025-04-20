@@ -11,6 +11,17 @@ const loadingIndicator = document.getElementById('loading');
 const errorMessage = document.getElementById('error-message');
 const relatedMangaSection = document.getElementById('related-manga-section');
 const relatedMangaGrid = document.getElementById('related-manga-grid');
+const editModal = document.getElementById('edit-modal');
+const closeModalBtn = document.getElementById('close-modal');
+const saveChangesBtn = document.getElementById('save-changes');
+const deleteMangaBtn = document.getElementById('delete-manga');
+const editMangaInfo = document.getElementById('edit-manga-info');
+const editStatusSelect = document.getElementById('edit-status');
+const editScoreSelect = document.getElementById('edit-score');
+const editProgressInput = document.getElementById('edit-progress');
+const totalChaptersSpan = document.getElementById('total-chapters');
+const editNotesTextarea = document.getElementById('edit-notes');
+const modalTitle = document.getElementById('modal-title');
 
 // Navigation search bar functionality
 const navSearchInput = document.querySelector('header .search-bar input');
@@ -49,6 +60,18 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'my-list.html';
         });
     }
+    
+    // Setup modal event listeners
+    closeModalBtn.addEventListener('click', closeModal);
+    saveChangesBtn.addEventListener('click', saveChanges);
+    deleteMangaBtn.addEventListener('click', deleteManga);
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === editModal) {
+            closeModal();
+        }
+    });
 });
 
 // Handle navigation search
@@ -244,13 +267,6 @@ function renderMangaDetails(manga, characters = [], recommendations = []) {
                     <button class="action-button" id="add-to-list-btn">
                         <i class="fas fa-plus"></i> Add to List
                     </button>
-                    <div class="add-status-dropdown" id="status-dropdown" style="display: none;">
-                        <div class="dropdown-option" data-status="reading"><i class="fas fa-book-open"></i> Reading</div>
-                        <div class="dropdown-option" data-status="completed"><i class="fas fa-check"></i> Completed</div>
-                        <div class="dropdown-option" data-status="on-hold"><i class="fas fa-pause"></i> On Hold</div>
-                        <div class="dropdown-option" data-status="dropped"><i class="fas fa-times"></i> Dropped</div>
-                        <div class="dropdown-option" data-status="plan-to-read"><i class="fas fa-clock"></i> Plan to Read</div>
-                    </div>
                 </div>
                 
                 <!-- Synopsis -->
@@ -519,12 +535,11 @@ function addMangaToList(manga, status) {
     return true;
 }
 
-// Setup add to list button and dropdown
+// Setup add to list button and modal
 function setupAddToListButton(manga) {
     const addToListBtn = document.getElementById('add-to-list-btn');
-    const statusDropdown = document.getElementById('status-dropdown');
     
-    if (!addToListBtn || !statusDropdown) return;
+    if (!addToListBtn) return;
     
     // Check if manga is already in list
     const inList = isMangaInList(manga.mal_id);
@@ -533,41 +548,189 @@ function setupAddToListButton(manga) {
     // Update button appearance and text
     if (inList && currentStatus) {
         addToListBtn.classList.add('in-list');
-        addToListBtn.innerHTML = `<i class="fas fa-check"></i> ${formatStatusText(currentStatus)}`;
+        addToListBtn.innerHTML = `<i class="fas fa-edit"></i> Edit in My List`;
+        modalTitle.textContent = 'Edit Manga';
+    } else {
+        addToListBtn.innerHTML = `<i class="fas fa-plus"></i> Add to List`;
+        modalTitle.textContent = 'Add to My List';
     }
     
-    // Toggle dropdown when button is clicked
+    // Open modal when button is clicked
     addToListBtn.addEventListener('click', () => {
-        statusDropdown.style.display = statusDropdown.style.display === 'none' ? 'block' : 'none';
+        openEditModal(manga);
     });
+}
+
+// Open the edit modal for a manga
+function openEditModal(manga) {
+    // Get current manga data if it exists in the list
+    const inList = isMangaInList(manga.mal_id);
+    let currentData = null;
     
-    // Handle dropdown option clicks
-    const options = statusDropdown.querySelectorAll('.dropdown-option');
-    options.forEach(option => {
-        option.addEventListener('click', () => {
-            const status = option.getAttribute('data-status');
-            
-            // Add manga to list
-            addMangaToList(manga, status);
-            
-            // Update button text
-            addToListBtn.classList.add('in-list');
-            addToListBtn.innerHTML = `<i class="fas fa-check"></i> ${formatStatusText(status)}`;
-            
-            // Hide dropdown
-            statusDropdown.style.display = 'none';
-            
-            // Show success message
-            alert(`"${manga.title}" has been added to your ${formatStatusText(status)} list.`);
-        });
-    });
+    if (inList) {
+        const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const myList = JSON.parse(savedList);
+        currentData = myList.find(m => m.id === parseInt(manga.mal_id));
+    }
     
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!addToListBtn.contains(e.target) && !statusDropdown.contains(e.target)) {
-            statusDropdown.style.display = 'none';
+    // Populate manga info
+    editMangaInfo.innerHTML = `
+        <div class="edit-manga-cover">
+            <img src="${manga.images.jpg.image_url}" alt="${manga.title}">
+        </div>
+        <div class="edit-manga-details">
+            <div class="edit-manga-title">${manga.title}</div>
+            <div class="edit-manga-subtitle">${manga.type || 'Unknown'} · ${manga.published ? new Date(manga.published.from).getFullYear() : 'Unknown'}</div>
+        </div>
+    `;
+    
+    // Set form values
+    editStatusSelect.value = currentData ? currentData.status : 'plan-to-read';
+    editScoreSelect.value = currentData ? currentData.score : '0';
+    editProgressInput.value = currentData ? currentData.progress : 0;
+    totalChaptersSpan.textContent = manga.chapters || '?';
+    editNotesTextarea.value = currentData ? currentData.notes : '';
+    
+    // Handle delete button visibility
+    if (inList) {
+        deleteMangaBtn.style.display = 'block';
+    } else {
+        deleteMangaBtn.style.display = 'none';
+    }
+    
+    // Show the modal
+    editModal.style.display = 'flex';
+}
+
+// Close the edit modal
+function closeModal() {
+    editModal.style.display = 'none';
+}
+
+// Save changes from the edit modal
+function saveChanges() {
+    const manga = getCurrentMangaDetails();
+    if (!manga) return;
+    
+    // Get values from the form
+    const status = editStatusSelect.value;
+    const score = parseInt(editScoreSelect.value) || 0;
+    const progress = parseInt(editProgressInput.value) || 0;
+    const notes = editNotesTextarea.value;
+    
+    // Get current list or initialize empty array
+    const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const myList = savedList ? JSON.parse(savedList) : [];
+    
+    // Check if manga is already in list
+    const existingIndex = myList.findIndex(m => m.id === manga.mal_id);
+    
+    if (existingIndex !== -1) {
+        // Update existing manga
+        myList[existingIndex].status = status;
+        myList[existingIndex].score = score;
+        myList[existingIndex].progress = progress;
+        myList[existingIndex].notes = notes;
+    } else {
+        // Add new manga to list
+        const newManga = {
+            id: manga.mal_id,
+            title: manga.title,
+            type: manga.type || 'Unknown',
+            imageUrl: manga.images.jpg.image_url,
+            year: manga.published ? new Date(manga.published.from).getFullYear() : null,
+            totalChapters: manga.chapters,
+            status: status,
+            score: score,
+            progress: progress,
+            notes: notes,
+            dateAdded: new Date().toISOString()
+        };
+        
+        myList.push(newManga);
+    }
+    
+    // Save updated list
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(myList));
+    
+    // Update Add to List button
+    const addToListBtn = document.getElementById('add-to-list-btn');
+    if (addToListBtn) {
+        addToListBtn.classList.add('in-list');
+        addToListBtn.innerHTML = `<i class="fas fa-edit"></i> Edit in My List`;
+    }
+    
+    // Close the modal
+    closeModal();
+    
+    // Show success message
+    const actionText = existingIndex !== -1 ? 'updated' : 'added to';
+    alert(`"${manga.title}" has been ${actionText} your list.`);
+}
+
+// Delete manga from the list
+function deleteManga() {
+    const manga = getCurrentMangaDetails();
+    if (!manga) return;
+    
+    // Confirm deletion
+    if (confirm(`Are you sure you want to remove "${manga.title}" from your list?`)) {
+        // Get current list
+        const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!savedList) return;
+        
+        let myList = JSON.parse(savedList);
+        
+        // Remove manga from list
+        myList = myList.filter(m => m.id !== manga.mal_id);
+        
+        // Save updated list
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(myList));
+        
+        // Update Add to List button
+        const addToListBtn = document.getElementById('add-to-list-btn');
+        if (addToListBtn) {
+            addToListBtn.classList.remove('in-list');
+            addToListBtn.innerHTML = `<i class="fas fa-plus"></i> Add to List`;
         }
-    });
+        
+        // Close the modal
+        closeModal();
+        
+        // Show success message
+        alert(`"${manga.title}" has been removed from your list.`);
+    }
+}
+
+// Get current manga details from the page
+function getCurrentMangaDetails() {
+    try {
+        const title = document.querySelector('.manga-title-section h1').textContent;
+        const mal_id = parseInt(mangaId);
+        
+        // Get other details (we may need to fetch these from API again)
+        const type = document.querySelector('.manga-meta-item:nth-child(1)').textContent.trim();
+        const chapters = totalChaptersSpan.textContent !== '?' ? parseInt(totalChaptersSpan.textContent) : null;
+        
+        // Get image URL from edit modal
+        const imageUrl = document.querySelector('.edit-manga-cover img').src;
+        
+        // Build a partial manga object with essential details
+        return {
+            mal_id,
+            title,
+            type,
+            chapters,
+            images: {
+                jpg: {
+                    image_url: imageUrl
+                }
+            }
+        };
+    } catch (error) {
+        console.error('Error getting current manga details:', error);
+        return null;
+    }
 }
 
 // Format status text for display
