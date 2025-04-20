@@ -3,6 +3,7 @@ const JIKAN_API_BASE = 'https://api.jikan.moe/v4';
 const MANGA_DETAIL_ENDPOINT = '/manga';
 const MANGA_CHARACTERS_ENDPOINT = '/characters';
 const MANGA_RECOMMENDATIONS_ENDPOINT = '/recommendations';
+const LOCAL_STORAGE_KEY = 'myMangaList';
 
 // DOM Elements
 const mangaDetailContainer = document.getElementById('manga-detail');
@@ -40,6 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add back-to-top button functionality
     setupBackToTopButton();
+    
+    // Setup user profile icon to navigate to My List
+    const userProfileIcon = document.querySelector('.user-profile i');
+    if (userProfileIcon) {
+        userProfileIcon.addEventListener('click', () => {
+            window.location.href = 'my-list.html';
+        });
+    }
 });
 
 // Handle navigation search
@@ -232,9 +241,16 @@ function renderMangaDetails(manga, characters = [], recommendations = []) {
                 
                 <!-- Action Button -->
                 <div class="manga-actions">
-                    <button class="action-button">
+                    <button class="action-button" id="add-to-list-btn">
                         <i class="fas fa-plus"></i> Add to List
                     </button>
+                    <div class="add-status-dropdown" id="status-dropdown" style="display: none;">
+                        <div class="dropdown-option" data-status="reading"><i class="fas fa-book-open"></i> Reading</div>
+                        <div class="dropdown-option" data-status="completed"><i class="fas fa-check"></i> Completed</div>
+                        <div class="dropdown-option" data-status="on-hold"><i class="fas fa-pause"></i> On Hold</div>
+                        <div class="dropdown-option" data-status="dropped"><i class="fas fa-times"></i> Dropped</div>
+                        <div class="dropdown-option" data-status="plan-to-read"><i class="fas fa-clock"></i> Plan to Read</div>
+                    </div>
                 </div>
                 
                 <!-- Synopsis -->
@@ -282,6 +298,9 @@ function renderMangaDetails(manga, characters = [], recommendations = []) {
     // Display the manga details
     mangaDetailContainer.innerHTML = detailHTML;
     mangaDetailContainer.style.display = 'block';
+    
+    // Setup the add to list button functionality
+    setupAddToListButton(manga);
     
     // Render related manga if available
     if (recommendations && recommendations.length > 0) {
@@ -442,4 +461,124 @@ function showError(message) {
     errorMessage.style.display = 'block';
     loadingIndicator.style.display = 'none';
     mangaDetailContainer.style.display = 'none';
+}
+
+// Check if manga is in user's list
+function isMangaInList(id) {
+    const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!savedList) return false;
+    
+    const myList = JSON.parse(savedList);
+    return myList.some(manga => manga.id === parseInt(id));
+}
+
+// Get manga status from user's list
+function getMangaStatus(id) {
+    const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!savedList) return null;
+    
+    const myList = JSON.parse(savedList);
+    const manga = myList.find(m => m.id === parseInt(id));
+    return manga ? manga.status : null;
+}
+
+// Add manga to user's list
+function addMangaToList(manga, status) {
+    // Get current list or initialize empty array
+    const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const myList = savedList ? JSON.parse(savedList) : [];
+    
+    // Check if manga is already in list
+    const existingIndex = myList.findIndex(m => m.id === manga.mal_id);
+    
+    if (existingIndex !== -1) {
+        // Update status if manga exists
+        myList[existingIndex].status = status;
+    } else {
+        // Add new manga to list
+        const newManga = {
+            id: manga.mal_id,
+            title: manga.title,
+            type: manga.type || 'Unknown',
+            imageUrl: manga.images.jpg.image_url,
+            year: manga.published ? new Date(manga.published.from).getFullYear() : null,
+            totalChapters: manga.chapters,
+            status: status,
+            score: 0,
+            progress: 0,
+            notes: '',
+            dateAdded: new Date().toISOString()
+        };
+        
+        myList.push(newManga);
+    }
+    
+    // Save updated list
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(myList));
+    
+    return true;
+}
+
+// Setup add to list button and dropdown
+function setupAddToListButton(manga) {
+    const addToListBtn = document.getElementById('add-to-list-btn');
+    const statusDropdown = document.getElementById('status-dropdown');
+    
+    if (!addToListBtn || !statusDropdown) return;
+    
+    // Check if manga is already in list
+    const inList = isMangaInList(manga.mal_id);
+    const currentStatus = getMangaStatus(manga.mal_id);
+    
+    // Update button appearance and text
+    if (inList && currentStatus) {
+        addToListBtn.classList.add('in-list');
+        addToListBtn.innerHTML = `<i class="fas fa-check"></i> ${formatStatusText(currentStatus)}`;
+    }
+    
+    // Toggle dropdown when button is clicked
+    addToListBtn.addEventListener('click', () => {
+        statusDropdown.style.display = statusDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    // Handle dropdown option clicks
+    const options = statusDropdown.querySelectorAll('.dropdown-option');
+    options.forEach(option => {
+        option.addEventListener('click', () => {
+            const status = option.getAttribute('data-status');
+            
+            // Add manga to list
+            addMangaToList(manga, status);
+            
+            // Update button text
+            addToListBtn.classList.add('in-list');
+            addToListBtn.innerHTML = `<i class="fas fa-check"></i> ${formatStatusText(status)}`;
+            
+            // Hide dropdown
+            statusDropdown.style.display = 'none';
+            
+            // Show success message
+            alert(`"${manga.title}" has been added to your ${formatStatusText(status)} list.`);
+        });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!addToListBtn.contains(e.target) && !statusDropdown.contains(e.target)) {
+            statusDropdown.style.display = 'none';
+        }
+    });
+}
+
+// Format status text for display
+function formatStatusText(status) {
+    const statusMap = {
+        'reading': 'Reading',
+        'completed': 'Completed',
+        'on-hold': 'On Hold',
+        'dropped': 'Dropped',
+        'plan-to-read': 'Plan to Read'
+    };
+    
+    return statusMap[status] || status;
 }

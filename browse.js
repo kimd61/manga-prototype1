@@ -50,6 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Set up user profile icon click
+    const userProfileIcon = document.querySelector('.user-profile i');
+    if (userProfileIcon) {
+        userProfileIcon.addEventListener('click', () => {
+            window.location.href = 'my-list.html';
+        });
+    }
+    
     // Check for search query in URL and populate search box
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search');
