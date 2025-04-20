@@ -427,6 +427,7 @@
     display: grid;
     grid-template-columns: 100px 1fr;
     row-gap: 10px;
+    font-size: 0.84rem;
 }
 
 .info-label {
