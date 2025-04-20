@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My List - MyMangaList</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="my-list.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>MyMangaList</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="browse.html">Browse</a></li>
+                    <li><a href="my-list.html" class="active">My List</a></li>
+                </ul>
+            </nav>
+            <div class="search-bar">
+                <input type="text" placeholder="Search for manga...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <div class="my-list-header">
+                <h1>My Manga List</h1>
+                <p>Manage your manga collection and track your reading progress</p>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="list-controls">
+                <div class="list-filter">
+                    <select id="status-filter">
+                        <option value="all">All Status</option>
+                        <option value="reading">Reading</option>
+                        <option value="completed">Completed</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="dropped">Dropped</option>
+                        <option value="plan-to-read">Plan to Read</option>
+                    </select>
+                </div>
+                <div class="list-sort">
+                    <select id="sort-filter">
+                        <option value="title">Title</option>
+                        <option value="score">Score</option>
+                        <option value="progress">Progress</option>
+                        <option value="date-added">Date Added</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Empty State Message (shown when no manga in list) -->
+            <div class="empty-list" id="empty-list">
+                <div class="empty-list-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h2>Your list is empty</h2>
+                <p>Start adding manga to your list by browsing our collection</p>
+                <a href="browse.html" class="primary-button">Browse Manga</a>
+            </div>
+
+            <!-- Manga List Table -->
+            <div class="manga-list-table" id="manga-list-table">
+                <div class="list-table-header">
+                    <div class="list-cell cell-cover">Cover</div>
+                    <div class="list-cell cell-title">Title</div>
+                    <div class="list-cell cell-score">Score</div>
+                    <div class="list-cell cell-progress">Progress</div>
+                    <div class="list-cell cell-status">Status</div>
+                    <div class="list-cell cell-actions">Actions</div>
+                </div>
+                <div class="list-table-body" id="list-table-body">
+                    <!-- Manga list items will be populated here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Modal -->
+    <div class="edit-modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Manga</h2>
+                <button class="close-modal" id="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-manga-info" id="edit-manga-info">
+                    <!-- Manga info will be populated here -->
+                </div>
+                <div class="edit-form">
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select id="edit-status">
+                            <option value="reading">Reading</option>
+                            <option value="completed">Completed</option>
+                            <option value="on-hold">On Hold</option>
+                            <option value="dropped">Dropped</option>
+                            <option value="plan-to-read">Plan to Read</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-score">Score</label>
+                        <select id="edit-score">
+                            <option value="0">(Select)</option>
+                            <option value="10">10 - Masterpiece</option>
+                            <option value="9">9 - Great</option>
+                            <option value="8">8 - Very Good</option>
+                            <option value="7">7 - Good</option>
+                            <option value="6">6 - Fine</option>
+                            <option value="5">5 - Average</option>
+                            <option value="4">4 - Bad</option>
+                            <option value="3">3 - Very Bad</option>
+                            <option value="2">2 - Horrible</option>
+                            <option value="1">1 - Appalling</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-progress">Progress</label>
+                        <div class="progress-input">
+                            <input type="number" id="edit-progress" min="0">
+                            <span>/ <span id="total-chapters">?</span> chapters</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-notes">Notes</label>
+                        <textarea id="edit-notes" rows="3" placeholder="Add your personal notes about this manga"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="delete-button" id="delete-manga">Remove from List</button>
+                <button class="save-button" id="save-changes">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 MyMangaList. Using Jikan API.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-reddit"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="my-list.js"></script>
+</body>
+</html>
