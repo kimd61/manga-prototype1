@@ -1,5 +1,29 @@
 /* My List Page Styles */
 
+/* Ensure full height layout */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Flex container to push footer down */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Make the main section expand */
+main {
+    flex: 1;
+}
+
+/* Optional: Add a little spacing above the footer */
+footer {
+    margin-top: 2rem;
+}
+
 /* Header */
 .my-list-header {
     margin: 40px 0 30px;
